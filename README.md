@@ -1,4 +1,4 @@
-# calibTraj
+# calibTraj (not yet complete!)
 
 here comes the gen description
 
