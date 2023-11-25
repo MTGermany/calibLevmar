@@ -29,7 +29,7 @@
 
 using namespace std;
 
-#include "levmar.h"
+#include "levmar-2.5/levmar.h"
 
 #include "InOut.h"
 #include "Math.h"

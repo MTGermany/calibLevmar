@@ -10,8 +10,9 @@ CONFIGFLAGS=#-ULINSOLVERS_RETAIN_MEMORY
 CFLAGS=$(CONFIGFLAGS) $(ARCHFLAGS) -O3 -funroll-loops -Wall #-ffast-math #-pg
 LAPACKLIBS_PATH=/usr/local/lib # WHEN USING LAPACK, CHANGE THIS TO WHERE YOUR COMPILED LIBS ARE!
 LDFLAGS=-L$(LAPACKLIBS_PATH) -L.
-LIBOBJS=lm.o Axb.o misc.o lmlec.o lmbc.o lmblec.o lmbleic.o
-LIBSRCS=lm.c Axb.c misc.c lmlec.c lmbc.c lmblec.c lmbleic.c
+LIB_LEVMAR=levmar-2.5
+LIBOBJS=${LIB_LEVMAR}/lm.o ${LIB_LEVMAR}/Axb.o ${LIB_LEVMAR}/misc.o ${LIB_LEVMAR}/lmlec.o ${LIB_LEVMAR}/lmbc.o ${LIB_LEVMAR}/lmblec.o ${LIB_LEVMAR}/lmbleic.o
+LIBSRCS=${LIB_LEVMAR}/lm.c ${LIB_LEVMAR}/Axb.c ${LIB_LEVMAR}/misc.c ${LIB_LEVMAR}/lmlec.c ${LIB_LEVMAR}/lmbc.c ${LIB_LEVMAR}/lmblec.c ${LIB_LEVMAR}/lmbleic.c
 DEMOBJS=lmdemo.o
 DEMOSRCS=lmdemo.c
 DEMOBJS2=expfit.o
@@ -40,32 +41,31 @@ RANLIB=ranlib
 LIBS=$(LAPACKLIBS)
 
 #own
-LIBOBJECTS=InOut.o Statistics.o Math.o RandomUtils.o general.o
-LIBDIR=~/versionedProjects/lib/trunk
+MY_LIBOBJECTS=InOut.o Statistics.o Math.o RandomUtils.o general.o
+MY_LIBDIR=my-lib
 BINDIR=~/bin
 ###########################################################
 # suffix regel: mache aus *.cpp ein *.o, und zwar fuer eingabedatei $<
 .cpp.o:
-	${CC} -I ${LIBDIR}  -c $<
+	${CC} -I ${MY_LIBDIR}  -c $<
 
 ############################################################
 
-general.o: ${LIBDIR}/general.cpp
-	${CC} -c ${LIBDIR}/general.cpp -o general.o
+general.o: ${MY_LIBDIR}/general.cpp
+	${CC} -c ${MY_LIBDIR}/general.cpp -o general.o
 
-InOut.o: ${LIBDIR}/InOut.cpp
-	${CC} -c ${LIBDIR}/InOut.cpp -o InOut.o
+InOut.o: ${MY_LIBDIR}/InOut.cpp
+	${CC} -c ${MY_LIBDIR}/InOut.cpp -o InOut.o
 
-Statistics.o: ${LIBDIR}/Statistics.cpp
-	${CC} -c ${LIBDIR}/Statistics.cpp -o Statistics.o
+Statistics.o: ${MY_LIBDIR}/Statistics.cpp
+	${CC} -c ${MY_LIBDIR}/Statistics.cpp -o Statistics.o
 
-Math.o: ${LIBDIR}/Math.cpp
-	${CC} -c ${LIBDIR}/Math.cpp -o Math.o
+Math.o: ${MY_LIBDIR}/Math.cpp
+	${CC} -c ${MY_LIBDIR}/Math.cpp -o Math.o
 
-RandomUtils.o: ${LIBDIR}/RandomUtils.cpp
-	${CC} -c ${LIBDIR}/RandomUtils.cpp -o RandomUtils.o
+RandomUtils.o: ${MY_LIBDIR}/RandomUtils.cpp
+	${CC} -c ${MY_LIBDIR}/RandomUtils.cpp -o RandomUtils.o
 #end own
-
 
 all: liblevmar.a lmdemo expfit calibTraj calibTrajTest calibDiscrChoice
 
@@ -78,37 +78,37 @@ lmdemo: $(DEMOBJS) liblevmar.a
 expfit: $(DEMOBJS2) liblevmar.a
 	$(CPP) $(LDFLAGS) $(DEMOBJS2) -o expfit -llevmar $(LIBS) -lm
 #own
-calibTraj: $(CALIBTRAJOBJ) $(LIBOBJECTS) liblevmar.a
-	$(CPP) $(LDFLAGS) $(CALIBTRAJOBJ) $(LIBOBJECTS) -o $(BINDIR)/calibTraj -llevmar $(LIBS) -lm
-calibTrajTest: calibTrajTest.o $(LIBOBJECTS) liblevmar.a
-	$(CPP) $(LDFLAGS) calibTrajTest.o $(LIBOBJECTS) -o $(BINDIR)/calibTrajTest -llevmar $(LIBS) -lm
+calibTraj: $(CALIBTRAJOBJ) $(MY_LIBOBJECTS) liblevmar.a
+	$(CPP) $(LDFLAGS) $(CALIBTRAJOBJ) $(MY_LIBOBJECTS) -o $(BINDIR)/calibTraj -llevmar $(LIBS) -lm
+calibTrajTest: calibTrajTest.o $(MY_LIBOBJECTS) liblevmar.a
+	$(CPP) $(LDFLAGS) calibTrajTest.o $(MY_LIBOBJECTS) -o $(BINDIR)/calibTrajTest -llevmar $(LIBS) -lm
 
-makeEFCfromFCdata: $(EFCOBJ) $(LIBOBJECTS)
-	$(CPP) $(LDFLAGS) $(EFCOBJ) $(LIBOBJECTS) -o $(BINDIR)/makeEFCfromFCdata -lm
+makeEFCfromFCdata: $(EFCOBJ) $(MY_LIBOBJECTS)
+	$(CPP) $(LDFLAGS) $(EFCOBJ) $(MY_LIBOBJECTS) -o $(BINDIR)/makeEFCfromFCdata -lm
 
-determineDrivingRegimes: determineDrivingRegimes.o $(LIBOBJECTS)
-	$(CPP) $(LDFLAGS) determineDrivingRegimes.o $(LIBOBJECTS) -o $(BINDIR)/determineDrivingRegimes -lm
+determineDrivingRegimes: determineDrivingRegimes.o $(MY_LIBOBJECTS)
+	$(CPP) $(LDFLAGS) determineDrivingRegimes.o $(MY_LIBOBJECTS) -o $(BINDIR)/determineDrivingRegimes -lm
 
-calibDiscrChoice: calibDiscrChoice.o $(LIBOBJECTS) liblevmar.a
-	$(CPP) $(LDFLAGS) calibDiscrChoice.o  $(LIBOBJECTS) -o $(BINDIR)/calibDiscrChoice -llevmar $(LIBS) -lm
+calibDiscrChoice: calibDiscrChoice.o $(MY_LIBOBJECTS) liblevmar.a
+	$(CPP) $(LDFLAGS) calibDiscrChoice.o  $(MY_LIBOBJECTS) -o $(BINDIR)/calibDiscrChoice -llevmar $(LIBS) -lm
 
 #end own
 
-lm.o: lm.c lm_core.c levmar.h misc.h compiler.h
-Axb.o: Axb.c Axb_core.c levmar.h misc.h
-misc.o: misc.c misc_core.c levmar.h misc.h
-lmlec.o: lmlec.c lmlec_core.c levmar.h misc.h
-lmbc.o: lmbc.c lmbc_core.c levmar.h misc.h compiler.h
-lmblec.o: lmblec.c lmblec_core.c levmar.h misc.h
-lmbleic.o: lmbleic.c lmbleic_core.c levmar.h misc.h
+lm.o: ${LIB_LEVMAR}/lm.c ${LIB_LEVMAR}/lm_core.c ${LIB_LEVMAR}/levmar.h ${LIB_LEVMAR}/misc.h ${LIB_LEVMAR}/compiler.h
+Axb.o: ${LIB_LEVMAR}/Axb.c ${LIB_LEVMAR}/Axb_core.c ${LIB_LEVMAR}/levmar.h ${LIB_LEVMAR}/misc.h
+misc.o:${LIB_LEVMAR}/misc.c ${LIB_LEVMAR}/misc_core.c ${LIB_LEVMAR}/levmar.h ${LIB_LEVMAR}/misc.h
+lmlec.o: ${LIB_LEVMAR}/lmlec.c ${LIB_LEVMAR}/lmlec_core.c ${LIB_LEVMAR}/levmar.h ${LIB_LEVMAR}/misc.h
+lmbc.o: ${LIB_LEVMAR}/lmbc.c ${LIB_LEVMAR}/lmbc_core.c ${LIB_LEVMAR}/levmar.h ${LIB_LEVMAR}/misc.h ${LIB_LEVMAR}/compiler.h
+lmblec.o: ${LIB_LEVMAR}/lmblec.c ${LIB_LEVMAR}/lmblec_core.c ${LIB_LEVMAR}/levmar.h ${LIB_LEVMAR}/misc.h
+lmbleic.o: ${LIB_LEVMAR}/lmbleic.c ${LIB_LEVMAR}/lmbleic_core.c ${LIB_LEVMAR}/levmar.h ${LIB_LEVMAR}/misc.h
 
-lmdemo.o: levmar.h
-expfit.o: levmar.h
-calibTraj.o: levmar.h
-calibTrajTest.o: levmar.h
+lmdemo.o: ${LIB_LEVMAR}/levmar.h
+expfit.o: ${LIB_LEVMAR}/levmar.h
+calibTraj.o: ${LIB_LEVMAR}/levmar.h
+calibTrajTest.o: ${LIB_LEVMAR}/levmar.h
 
 clean:
-	@rm -f $(LIBOBJS) $(DEMOBJS)
+	@rm -f $(LIBOBJS) $(DEMOBJS) $(MY_LIBOBJECTS) *.o
 
 cleanall: clean
 	@rm -f lmdemo

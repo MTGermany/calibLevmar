@@ -1,7 +1,6 @@
 # user-defined ignores (avoid committing large files)
 
 *.swp
-a.out
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
@@ -15,24 +14,24 @@ a.out
 
 ## generated object files
 *.o
-
-## generated simulation files by running mic
-*.car*
-*.dat
-*.micdat
-*.x[0-9]*
-*.fund*
-*.ps
-*.eps
-*.tt
+liblevmar.a
 
 ## generated general files 
-*_ger.html
-*_ger.js
+a.out
+*.out
 *~
-int
+*.beta[0-9]_beta[0-9]
+expfit 
 
-## old (before git)
-trunk/src/save/
-trunk/src_jan14/
-trunk/src_old/
+## private docu
+*.README*
+README_*
+*.pdf
+
+## not relevant c++ files for this repo
+Vfunc.cpp
+calibDiscrChoice.cpp
+calibDiscrChoiceThreshold.cpp
+makeEFCfromFCdata.cpp
+expfit.cpp
+save
