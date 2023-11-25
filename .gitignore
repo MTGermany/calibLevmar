@@ -1,0 +1,38 @@
+# user-defined ignores (avoid committing large files)
+
+*.swp
+a.out
+
+## Core latex/pdflatex auxiliary files:
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.dvi
+
+## generated object files
+*.o
+
+## generated simulation files by running mic
+*.car*
+*.dat
+*.micdat
+*.x[0-9]*
+*.fund*
+*.ps
+*.eps
+*.tt
+
+## generated general files 
+*_ger.html
+*_ger.js
+*~
+int
+
+## old (before git)
+trunk/src/save/
+trunk/src_jan14/
+trunk/src_old/
