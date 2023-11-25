@@ -108,7 +108,7 @@ calibTraj.o: ${LIB_LEVMAR}/levmar.h
 calibTrajTest.o: ${LIB_LEVMAR}/levmar.h
 
 clean:
-	@rm -f $(LIBOBJS) $(DEMOBJS) $(MY_LIBOBJECTS) *.o
+	@rm -f $(LIBOBJS) $(DEMOBJS) $(MY_LIBOBJECTS) *.o expfit
 
 cleanall: clean
 	@rm -f lmdemo

@@ -1,6 +1,7 @@
-# calibTraj (not yet complete!)
+# calibTraj 
 
-here comes the gen description
+The repo is now complete and working but not yet documented.
+Now just stubs.
 
 ## Compiling
 
