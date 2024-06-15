@@ -186,6 +186,9 @@ double intp (const double tab[], int n,double x,
     exit(1);
   }
 
+  //if((i>717)&&(i<723)){
+  //  cout<<"intp: i="<<i<<" intp_value="<<intp_value<<endl;
+  //}
   return(intp_value);
 }
 

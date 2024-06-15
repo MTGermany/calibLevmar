@@ -747,6 +747,14 @@ void micGlobalFunc(double *beta, double *hats_or_lns,
 		  - 0.5*dtSim*(vSim[i-1]+vSim[i]));
     }
 
+    if(false){
+      //if((iData>1425)&&(iData<1455)){//!!!
+      cout<<"iData="<<iData<<" i="<<i
+	  <<" sSim[i]="<<sSim[i]
+	  <<" sSim[i-1]="<<sSim[i-1]
+	  <<" vSim[i]="<<vSim[i]
+	  <<endl;
+    }
 
 
     //!!
@@ -780,22 +788,27 @@ void micGlobalFunc(double *beta, double *hats_or_lns,
     // => INTERNAL CALCULATION OF NEW TARGETS ...
     // ========================================================
 
-    //first-order better! (newTarget=^ first order by principle)  
-    bool newTargetDetected=(USE_NEW_DATA_TO_DETERMINIE_TARGETS)
-      ? newTarget[iData] : newTarget[iDataBefore];
+    //first-order better! (newTarget=^ first order by principle)
+    bool newTargetDetected=false;
+    for(int i=iDataBefore; i<=iData; i++){//!!!
+      if(newTarget[i]){newTargetDetected=true;}
+    }
+    //bool newTargetDetected=(USE_NEW_DATA_TO_DETERMINIE_TARGETS)
+    //  ? newTarget[iData] : newTarget[iDataBefore]; //!!!
 
-
+   
     // reset follower gap if new leader
     // (!! in data, gaps restricted to sdata>=GAP_MIN)
-    
     if(newTargetDetected){
     //if(newTarget[iDataBefore]&&(iDataBefore!=iData2Before)){ // 2nd order
       
       sSim[i]=sdata[iData];  // v not reset!!! (=> (6e)
+                  // v not reset!!! (=> (6e)
       //vSim[i]=vdata[iData];  // v not reset!!! (=> (6e)
       //if(true){
-      if(DEBUG_TARGETS){
-	cout<<"iData="<<iData<<" tSim (always start with 0)="<<tSim
+      if(DEBUG_TARGETS){ //!!!
+	cout<<"new target! iData="<<iData
+	    <<" tSim (always start with 0)="<<tSim
 	    <<": reset sSim[i]=sdata[iData]="<<sSim[i]
 	    <<", unchanged vSim[i]="<<vSim[i]<<endl;
       }
@@ -849,8 +862,21 @@ void micGlobalFunc(double *beta, double *hats_or_lns,
   if(calType==1){ // SSE(s)
     for (int i=0; i<ndata; i++){
       int isim=int(i*dtData/dtSim+1e-6); //!! 1e-6 crucial
-      hats_or_lns[i]=(newTarget[i]) 
-	? sdata[i] : intp(sSim, nSim, i*dtData, 0, tmax);
+      //hats_or_lns[i]=(newTarget[i]) //!!!
+      //	? sdata[i] : intp(sSim, nSim, i*dtData, 0, tmax);
+      hats_or_lns[i]=intp(sSim, nSim, i*dtData, 0, tmax);//!!!
+
+      if(false){
+	//if((i>1425)&&(i<1455)){//!!!
+	cout<<"on outpu for dlevmar: i="<<i
+	    <<" hats_or_lns[i]="<<hats_or_lns[i]
+	    <<" i*dtData="<<i*dtData
+	    <<" nSim="<<nSim<<" tmax="<<tmax
+	    <<" isim="<<isim
+	    <<" sSim[isim]="<<sSim[isim]
+	    <<endl;
+      }
+
     }
   }
 
