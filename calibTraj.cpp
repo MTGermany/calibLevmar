@@ -2179,8 +2179,8 @@ int main(int argc, char* argv[]){
   if(calcObjLandscape){
 
   double dtCorr=1; // assume calculated variances erroneous for dt<dtCorr
-  double w_stddev=4*max(1.,sqrt(dtCorr/dtData)); // half-width of scanning range in (true) stddev
-  int nout=31; // number of grid elements in either direction
+  double w_stddev=6*max(1.,sqrt(dtCorr/dtData)); //!!! half-width of scanning range in (true) stddev
+  int nout=41; // number of grid elements in either direction
   double v0minLimit=0.5*stat.getmax(vdata,ndata);
   double v0maxLimit=50;
   double TminLimit=-0.5;
@@ -2203,13 +2203,15 @@ int main(int argc, char* argv[]){
   // for the IDM and Gipps variants
   // model={IDM,IDM_v0fix,ACC,GIP,OVM,FVDM,ADAS,
   //        IDMdelay,IDM_v0bfix,IDM_bfix,LCM}
+  // beta={v0,T.s0.a.b.cool}
   if((choice_model<4) || (choice_model>6)){
-    if(!(stddev[0]>0.15)){stddev[0]=0.15;}
-    if(!(stddev[1]>0.1)){stddev[1]=0.1;}
-    if(!(stddev[2]>0.1)){stddev[2]=0.1;}
-    if(!(stddev[3]>0.1)){stddev[3]=0.1;}
+    if(!(stddev[0]>0.5)){stddev[0]=0.5;}
+    if(!(stddev[1]>0.05)){stddev[1]=0.05;}
+    if(!(stddev[2]>0.2)){stddev[2]=0.2;}
+    if(!(stddev[3]>0.2)){stddev[3]=0.2;}
     if(!(stddev[4]>0.2)){stddev[4]=0.2;}
-    if(!(stddev[5]>0.2)){stddev[5]=0.2;} // not relevant for Gipps
+    if(!(stddev[5]>0.2)){stddev[5]=0.2;} // not relevant for ACC, Gipps
+    
   }
 
 
@@ -2290,6 +2292,7 @@ int main(int argc, char* argv[]){
 	  objFunData[i][j]=(calType==0)
 	    ? min(objFun(micLocalFunc,beta, Mparam, ndata, data), SSEmax)
 	    : min(objFun(micGlobalFunc,beta, Mparam, ndata, data), SSEmax);
+	  objFunData[i][j] /=ndata; //!! SSE -> MSE
 	}
       }
 
@@ -2301,10 +2304,15 @@ int main(int argc, char* argv[]){
       stringstream ss_header1;
       ss_header1<<"#Objective function for beta"<<ibeta
 		<<" and beta"<<jbeta
-		<<"\n#Base values: ";
+		<<"\n#Base values:\n# ";
       for(int k=0; k<Mparam; k++){
-	ss_header1<<"beta"<<k<<"="<<betaFinal[k];
+	ss_header1<<" beta"<<k<<"="<<betaFinal[k];
       }
+      ss_header1<<"\nassumed stdev:\n# ";
+      for(int k=0; k<Mparam; k++){
+	ss_header1<<" dbeta"<<k<<"="<<dbeta[k];
+      }
+      
       ss_header1<<"\n#Min Obj function: "<<info[1]
 		<<"\n#beta"<<ibeta<<"\t\tbeta"<<jbeta<<"\t\tSSE";
 
