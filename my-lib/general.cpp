@@ -167,28 +167,31 @@ bool fileExists(string filename)
 //  function  intp   
 //#####################################################################
 
-double intp (const double tab[], int n,double x, 
+double intp (const double tab[], int n, double x, 
 	     double xmin, double xmax)
-   /* intp interpolates the array tab with n 
- (before aug 04: n+1!!!) equidistant points
+   /* intp interpolates the array tab with n equidistant points 0...n-1
       in [xmin,xmax] at the location x; an error message is produced on
       attempting extrapolation */
 {
-  int nloc=n-1; //!!
   double intp_value;
-  double ir   = nloc*(x-xmin)/(xmax-xmin);
+  int nm1=n-1;
+  double ir   = nm1*(x-xmin)/(xmax-xmin);
   int    i    = (int) ir;
   double rest = ir-i;
-  if ((i>=0) && (i<=nloc-1))  intp_value =  (1-rest) * tab[i] + rest*tab[i+1];
-  else if (i==nloc) intp_value = tab[nloc];
+  if ((i>=0) && (i<nm1))  intp_value =  (1-rest) * tab[i] + rest*tab[i+1];
+  else if (i==nm1) intp_value = tab[nm1];
   else {
-    cout << "intp: index i = "<<i<<" (ir="<<ir<<") out of range\n";
+    cout << "intp: index i = "<<i<<" (ir="<<ir
+	 <<") out of range {0,...,nm1}\n";
     exit(1);
   }
 
-  //if((i>717)&&(i<723)){
-  //  cout<<"intp: i="<<i<<" intp_value="<<intp_value<<endl;
-  //}
+  
+  if(false){
+    //if(fabs(x-144.)<1e-6){
+    cout<<"intp: i="<<i<<" rest="<<rest
+	<<" n=nData="<<n<<" intp_value="<<intp_value<<endl;
+  }
   return(intp_value);
 }
 

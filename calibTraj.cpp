@@ -157,7 +157,7 @@ double accIDM(double s, double v, double vl, const double beta[]){
   double s0=maxsmooth(0,beta[2], 0.01);
   double  a=maxsmooth(0,beta[3], 0.01); //Math.h -> maxsmooth to prevent
   double  b=maxsmooth(0,beta[4], 0.01); //neg params. CHECK!
-  double sstar=max(GAP_MIN,s0+v*T+0.5*v*(v-vl)/sqrt(a*b)); //!!!
+  double sstar=max(GAP_MIN,s0+v*T+0.5*v*(v-vl)/sqrt(a*b)); 
   double accIDM=max(-BMAX, a*(1-pow(v/v0,4) - pow( sstar/s, 2)));
 
   //if((v>5.661)&&(v<5.663)){ // without exit
@@ -278,7 +278,7 @@ double accOVM(double s, double v, double vl, const double beta[]){
 // beta[0]=-a*s0/(v0*T), beta{1]=a/(v0*T), beta[2]=-a/v0, beta[3]=gamma
 
 double accLCM(double s, double v, double vl, const double beta[]){
-  double v0=20; //!!! fixed
+  double v0=20; //!! fixed
   double accLin=beta[0]+beta[1]*s+beta[2]*v+beta[3]*(vl-v);
   double acc=(v<v0) ? accLin : min(0.,accLin);
   return min(BMAX, max(-BMAX, acc));
@@ -302,12 +302,12 @@ double accGipps(double s, double v, double vl, const double beta[]){
   // simple: my simplified Gipps
 
   // double aFree=a;
-  // double vSafe=-b*T+sqrt(b*b*T*T+vl*vl+2*b*max(s-s0,0.)); // simple!!!
+  // double vSafe=-b*T+sqrt(b*b*T*T+vl*vl+2*b*max(s-s0,0.)); 
   // double vGipps=min(min(v+a*T,v0), vSafe);
 
   // full Gipps: assumptions theta=0.5 and bl=b or bl!=b (see mic->Gipps.cpp)
 
-  double bdivbl=1.0; // b/bl for full Gipps !!!
+  double bdivbl=1.0; // b/bl for full Gipps
   double vFree=v+2.5*T*a*(1-v/v0)*sqrt(0.025+v/v0);
   double vSafe=-b*T+sqrt(b*b*T*T+vl*vl*bdivbl+2*b*max(s-s0,0.)-b*v*T);
   double vGipps=min(vFree, vSafe);
@@ -604,10 +604,10 @@ void micGlobalFunc(double *beta, double *hats_or_lns,
 
 
   // (5) initialize simulation
-  //!! int(nSimReal)=723 even if nSimReal=724
+  //!!! nSimReal=nSim+1  (e.g. 1001 points from 0,0.1, ..., 100)
   
   const double nSimReal=ndata*dtData/dtSim;
-  const int nSim=int(nSimReal+1e-6);
+  const int nSim=int(nSimReal+1e-6+1);
   //cout<<"init! ndata="<<ndata
   //    <<" nSimReal="<<nSimReal<<" nSim="<<nSim<<endl;
   double tmax=(ndata-1)*dtData;
@@ -748,11 +748,10 @@ void micGlobalFunc(double *beta, double *hats_or_lns,
     }
 
     if(false){
-      //if((iData>1425)&&(iData<1455)){//!!!
+      //if((iData>1425)&&(iData<1455)){
       cout<<"iData="<<iData<<" i="<<i
 	  <<" sSim[i]="<<sSim[i]
 	  <<" sSim[i-1]="<<sSim[i-1]
-	  <<" vSim[i]="<<vSim[i]
 	  <<endl;
     }
 
@@ -790,23 +789,19 @@ void micGlobalFunc(double *beta, double *hats_or_lns,
 
     //first-order better! (newTarget=^ first order by principle)
     bool newTargetDetected=false;
-    for(int i=iDataBefore; i<=iData; i++){//!!!
+    for(int i=iDataBefore; i<=iData; i++){
       if(newTarget[i]){newTargetDetected=true;}
     }
-    //bool newTargetDetected=(USE_NEW_DATA_TO_DETERMINIE_TARGETS)
-    //  ? newTarget[iData] : newTarget[iDataBefore]; //!!!
 
    
     // reset follower gap if new leader
     // (!! in data, gaps restricted to sdata>=GAP_MIN)
     if(newTargetDetected){
-    //if(newTarget[iDataBefore]&&(iDataBefore!=iData2Before)){ // 2nd order
       
-      sSim[i]=sdata[iData];  // v not reset!!! (=> (6e)
-                  // v not reset!!! (=> (6e)
-      //vSim[i]=vdata[iData];  // v not reset!!! (=> (6e)
+      sSim[i]=sdata[iData]; 
+      //vSim[i]=vdata[iData];  // v not reset!! (=> (6e)
       //if(true){
-      if(DEBUG_TARGETS){ //!!!
+      if(DEBUG_TARGETS){ 
 	cout<<"new target! iData="<<iData
 	    <<" tSim (always start with 0)="<<tSim
 	    <<": reset sSim[i]=sdata[iData]="<<sSim[i]
@@ -861,13 +856,13 @@ void micGlobalFunc(double *beta, double *hats_or_lns,
 
   if(calType==1){ // SSE(s)
     for (int i=0; i<ndata; i++){
-      int isim=int(i*dtData/dtSim+1e-6); //!! 1e-6 crucial
-      //hats_or_lns[i]=(newTarget[i]) //!!!
-      //	? sdata[i] : intp(sSim, nSim, i*dtData, 0, tmax);
-      hats_or_lns[i]=intp(sSim, nSim, i*dtData, 0, tmax);//!!!
+      int isim=int(i*dtData/dtSim+1e-6); //!! +1e-6 sometimes crucial
+      hats_or_lns[i]=(newTarget[i]) //!! err corr: nSim=(tmax-tmin)/dtSim + 1
+      	? sdata[i] : intp(sSim, nSim, i*dtData, 0, tmax);
+      //hats_or_lns[i]=intp(sSim, nSim, i*dtData, 0, tmax);// more stable?
 
       if(false){
-	//if((i>1425)&&(i<1455)){//!!!
+	//if(fabs(i*dtData-144.)<1e-6){//!!
 	cout<<"on outpu for dlevmar: i="<<i
 	    <<" hats_or_lns[i]="<<hats_or_lns[i]
 	    <<" i*dtData="<<i*dtData
