@@ -789,7 +789,7 @@ void micGlobalFunc(double *beta, double *hats_or_lns,
 
     //first-order better! (newTarget=^ first order by principle)
     bool newTargetDetected=false;
-    for(int i=iDataBefore; i<=iData; i++){
+    for(int i=iDataBefore; i<iData; i++){
       if(newTarget[i]){newTargetDetected=true;}
     }
 
