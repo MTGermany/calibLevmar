@@ -55,6 +55,11 @@ const bool FVDM_FULL_LINEAR=false;
 
 const double BMAX=9; // maximum braking deceleration (all models except OVM)
 
+const double TAU_SERIAL_CORR=2; // since dlevmar* assumes no corr in covar
+const double W_STDDEV=10; // half-width of scanning range in (true) stddev
+const int NOUT=41; // # grid elements (either direction of obj landscape)
+const double FACT_SSEMAX_SSEMIN=4;
+
 // use dt*0.5*(vlLast+vlNew) to update gaps.
 // Otherwise, only follower's speed considered second order
 // but setting it to false is generally more robust
@@ -2078,6 +2083,12 @@ int main(int argc, char* argv[]){
 
 
   // header: fitted parameters and stdev
+  // covar calculated by dlevmar_bc_dif assumes i.i.d. noise
+  // => increase by serial correlation time TAU_SERIAL_CORR/dtData
+
+  for(int imm=0; imm<Mparam*Mparam; imm++){
+    covar[imm] *=TAU_SERIAL_CORR/dtData;
+  }
 
   ss_header<<setprecision(3)<<fixed;
 
@@ -2085,7 +2096,7 @@ int main(int argc, char* argv[]){
   for (int im=0; im<Mparam; im++){
     stddev[im]=sqrt(covar[Mparam*im+im]);
     ss_header<<"\n#\t"<<pstring[im]<<"="<<betaFinal[im]
-	     <<"\tsig_"<<pstring[im]<<"="<<stddev[im];
+	     <<"  sig_"<<pstring[im]<<"="<<stddev[im];
   }
 
 
@@ -2170,7 +2181,7 @@ int main(int argc, char* argv[]){
   // write min(SSE, SSEmax) because of plotting comfort
   //############################################
 
-  double SSEmax=10*SSEfinal; 
+  double SSEmax=FACT_SSEMAX_SSEMIN*SSEfinal; 
   data[7*ndata+3]=0; // =0 deactivates writing of endogeneous var in objFun
                      // and activates gap mismatch for param excursion
                      // control. Still hardly mismatch at plotted vals
@@ -2178,9 +2189,6 @@ int main(int argc, char* argv[]){
 
   if(calcObjLandscape){
 
-  double dtCorr=1; // assume calculated variances erroneous for dt<dtCorr
-  double w_stddev=6*max(1.,sqrt(dtCorr/dtData)); //!!! half-width of scanning range in (true) stddev
-  int nout=41; // number of grid elements in either direction
   double v0minLimit=0.5*stat.getmax(vdata,ndata);
   double v0maxLimit=50;
   double TminLimit=-0.5;
@@ -2217,8 +2225,8 @@ int main(int argc, char* argv[]){
 
   
   for (int j=0; j<Mparam; j++){
-    betamin[j]=betaFinal[j]-w_stddev*stddev[j];
-    betamax[j]=betaFinal[j]+w_stddev*stddev[j];
+    betamin[j]=betaFinal[j]-W_STDDEV*stddev[j];
+    betamax[j]=betaFinal[j]+W_STDDEV*stddev[j];
   }
 
 
@@ -2260,11 +2268,12 @@ int main(int argc, char* argv[]){
   
   
   for (int j=0; j<Mparam; j++){
-    dbeta[j]=(betamax[j]-betamin[j])/(nout-1);
+    dbeta[j]=(betamax[j]-betamin[j])/(NOUT-1);
     cout <<"j="<<j<<" beta[j]="<<beta[j]
-	 <<" betamin[j]="<<betamin[j]<<" betamax[j]="<<betamax[j]<<endl;
+	 <<" betamin[j]="<<betamin[j]<<" betamax[j]="<<betamax[j]
+	 <<" dbeta[j]="<<dbeta[j]<<endl;
   }
-
+  //exit(0); //!!!
 
 
   // make (Mparam-1)*(Mparam-2) data sets and files
@@ -2276,13 +2285,13 @@ int main(int argc, char* argv[]){
 
       // revert non-used dimensions
       for (int k=0; k<Mparam; k++){beta[k]=betaFinal[k];}
-      for (int i=0; i<nout; i++){
-	for (int j=0; j<nout; j++){
+      for (int i=0; i<NOUT; i++){
+	for (int j=0; j<NOUT; j++){
 
 	  beta[ibeta]=betamin[ibeta]+i*dbeta[ibeta];
 	  beta[jbeta]=betamin[jbeta]+j*dbeta[jbeta];
 	  if(false){
-	    cout <<"ibeta="<<ibeta<<" jbeta="<<jbeta<<" nout="<<nout
+	    cout <<"ibeta="<<ibeta<<" jbeta="<<jbeta<<" NOUT="<<NOUT
 	         <<" SSEmax="<<SSEmax<<" ndata="<<ndata<<endl;
 	    for(int k=0; k<Mparam; k++){
 	      cout<<"  beta["<<k<<"]="<<beta[k]<<endl;
@@ -2318,8 +2327,8 @@ int main(int argc, char* argv[]){
 
       sprintf(header,"%s",ss_header1.str().c_str());
 
-      inout.write_array2d(objFunFilename, betamin[ibeta],betamax[ibeta],nout,
-			  betamin[jbeta],betamax[jbeta],nout,
+      inout.write_array2d(objFunFilename, betamin[ibeta],betamax[ibeta],NOUT,
+			  betamin[jbeta],betamax[jbeta],NOUT,
 			  objFunData,header);
     }
   }
