@@ -279,7 +279,7 @@ double accOVM(double s, double v, double vl, const double beta[]){
   return accFVDM(s,v,vl,betaFVDM); // no BMAX restriction
 }
 
-// linear control model (LCM)
+// linear control model (LCM) model 10
 // beta[0]=-a*s0/(v0*T), beta{1]=a/(v0*T), beta[2]=-a/v0, beta[3]=gamma
 
 double accLCM(double s, double v, double vl, const double beta[]){
@@ -2114,6 +2114,7 @@ int main(int argc, char* argv[]){
    }
   }
 
+  cout<<"\nHier2: betaFinal[1]="<<betaFinal[1]<<endl;
 
   // get local accelerations/global trajectories for estimated parameters
 
@@ -2138,6 +2139,7 @@ int main(int argc, char* argv[]){
       hataFinal[i]=data[6*ndata+i];
     }
   }
+  cout<<"\nHier3: betaFinal[1]="<<betaFinal[1]<<endl;
 
 
   //############################################
@@ -2186,9 +2188,11 @@ int main(int argc, char* argv[]){
                      // and activates gap mismatch for param excursion
                      // control. Still hardly mismatch at plotted vals
                      // and faster -> OK
+  cout<<"\nHier4: betaFinal[1]="<<betaFinal[1]<<endl;
 
   if(calcObjLandscape){
 
+  cout<<"\nHier41: betaFinal[1]="<<betaFinal[1]<<endl;
   double v0minLimit=0.5*stat.getmax(vdata,ndata);
   double v0maxLimit=50;
   double TminLimit=-0.5;
@@ -2215,10 +2219,14 @@ int main(int argc, char* argv[]){
   if((choice_model<4) || (choice_model>6)){
     if(!(stddev[0]>0.5)){stddev[0]=0.5;}
     if(!(stddev[1]>0.05)){stddev[1]=0.05;}
-    if(!(stddev[2]>0.2)){stddev[2]=0.2;}
-    if(!(stddev[3]>0.2)){stddev[3]=0.2;}
-    if(!(stddev[4]>0.2)){stddev[4]=0.2;}
-    if(!(stddev[5]>0.2)){stddev[5]=0.2;} // not relevant for ACC, Gipps
+    cout<<"\nHier42: betaFinal[1]="<<betaFinal[1]<<endl;
+    if((Mparam>2)&&(!(stddev[2]>0.2))){stddev[2]=0.2;}
+    if((Mparam>3)&&(!(stddev[3]>0.2))){stddev[3]=0.2;}
+    cout<<"\nHier43: betaFinal[1]="<<betaFinal[1]<<endl;
+    if((Mparam>4)&&(!(stddev[4]>0.2))){stddev[4]=0.2;}
+    cout<<"\nHier44: betaFinal[1]="<<betaFinal[1]<<endl;
+    if((Mparam>5)&&(!(stddev[5]>0.2))){stddev[5]=0.2;}
+    cout<<"\nHier45: betaFinal[1]="<<betaFinal[1]<<endl;
     
   }
 
@@ -2257,19 +2265,17 @@ int main(int argc, char* argv[]){
   // beta[0]=-a*s0/(v0*T), beta[1]=a/(v0*T), beta[2]=-a/v0, beta[3]=gamma
 
 
-  cout <<"LCM: betamin[0]="<<betamin[0]<<" beta[0]="<<beta[0]<<endl;
-  if(false){
-    //if(choice_model==10){
-    betamin[0]=-1.5; betamax[0]=0.;
-    betamin[1]=0.; betamax[1]=0.5;
-    betamin[2]=-0.8; betamax[2]=0;
-    betamin[3]=0; betamax[3]=1.5;
+  if(choice_model==10){
+    betamin[0]=-1; betamax[0]=1.;
+    betamin[1]=0.; betamax[1]=2*betaFinal[1];
+    betamin[2]=2*betaFinal[2]; betamax[2]=0;
+    betamin[3]=0; betamax[3]=2*betaFinal[3];
   }
   
   
   for (int j=0; j<Mparam; j++){
     dbeta[j]=(betamax[j]-betamin[j])/(NOUT-1);
-    cout <<"j="<<j<<" beta[j]="<<beta[j]
+    cout <<"j="<<j<<" beta[j]="<<beta[j]<<" betaFinal[j]="<<betaFinal[j]
 	 <<" betamin[j]="<<betamin[j]<<" betamax[j]="<<betamax[j]
 	 <<" dbeta[j]="<<dbeta[j]<<endl;
   }
