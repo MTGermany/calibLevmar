@@ -2114,8 +2114,7 @@ int main(int argc, char* argv[]){
    }
   }
 
-  cout<<"\nHier2: betaFinal[1]="<<betaFinal[1]<<endl;
-
+ 
   // get local accelerations/global trajectories for estimated parameters
 
   double hataFinal[ndata];
@@ -2139,8 +2138,7 @@ int main(int argc, char* argv[]){
       hataFinal[i]=data[6*ndata+i];
     }
   }
-  cout<<"\nHier3: betaFinal[1]="<<betaFinal[1]<<endl;
-
+ 
 
   //############################################
   // Write result to file
@@ -2188,11 +2186,9 @@ int main(int argc, char* argv[]){
                      // and activates gap mismatch for param excursion
                      // control. Still hardly mismatch at plotted vals
                      // and faster -> OK
-  cout<<"\nHier4: betaFinal[1]="<<betaFinal[1]<<endl;
-
+ 
   if(calcObjLandscape){
 
-  cout<<"\nHier41: betaFinal[1]="<<betaFinal[1]<<endl;
   double v0minLimit=0.5*stat.getmax(vdata,ndata);
   double v0maxLimit=50;
   double TminLimit=-0.5;
@@ -2219,14 +2215,10 @@ int main(int argc, char* argv[]){
   if((choice_model<4) || (choice_model>6)){
     if(!(stddev[0]>0.5)){stddev[0]=0.5;}
     if(!(stddev[1]>0.05)){stddev[1]=0.05;}
-    cout<<"\nHier42: betaFinal[1]="<<betaFinal[1]<<endl;
     if((Mparam>2)&&(!(stddev[2]>0.2))){stddev[2]=0.2;}
     if((Mparam>3)&&(!(stddev[3]>0.2))){stddev[3]=0.2;}
-    cout<<"\nHier43: betaFinal[1]="<<betaFinal[1]<<endl;
     if((Mparam>4)&&(!(stddev[4]>0.2))){stddev[4]=0.2;}
-    cout<<"\nHier44: betaFinal[1]="<<betaFinal[1]<<endl;
     if((Mparam>5)&&(!(stddev[5]>0.2))){stddev[5]=0.2;}
-    cout<<"\nHier45: betaFinal[1]="<<betaFinal[1]<<endl;
     
   }
 
