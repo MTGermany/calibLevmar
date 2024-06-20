@@ -1835,7 +1835,7 @@ int main(int argc, char* argv[]){
   beta[3]=min(5.,0.5*stat.getmax(adata,ndata)); // a;  adata=accdata
   beta[4]=min(5.,max(1., -0.5*stat.getmin(adata,ndata)));  //b
 
-  if(choice_model==4){beta[3]=15;} //OVDM: high acceleration
+  if(choice_model==4){beta[3]=5;} //OVDM: high acceleration
   if(choice_model==5){beta[4]=0.2;} //FVDM: speed diff sensitivity gamma
   if(choice_model==6){beta[4]=0.1;} //ADAS v5: c1
   beta[5]=(choice_model==2) ? 0.5 :
@@ -2247,7 +2247,7 @@ int main(int argc, char* argv[]){
   }
   
 
-  if(choice_model==4){betamin[3]=4; betamax[3]=40;}
+  if(choice_model==4){betamin[3]=1; betamax[3]=40;}
   if(choice_model==5){betamin[3]=1; betamax[3]=12;}
   if(choice_model==7){betamin[5]=0; betamax[5]=1.1;}
 
